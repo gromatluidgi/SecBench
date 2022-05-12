@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 
 namespace SecBench.Domain.Entities.Files
 {
@@ -32,6 +31,17 @@ namespace SecBench.Domain.Entities.Files
         public ReadOnlyCollection<FileTree<TFile>> Children
         {
             get { return _children.AsReadOnly(); }
+        }
+
+        public IEnumerable<FileTree<TFile>> Path
+        {
+            get
+            {
+                var stack = new Stack<FileTree<TFile>>();
+                for (var current = Parent; current != null; current = current.Parent)
+                    stack.Push(current);
+                return stack;
+            }
         }
 
         public FileTree<TFile> AddChild(TFile file)
