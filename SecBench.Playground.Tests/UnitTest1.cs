@@ -111,5 +111,45 @@ namespace SecBench.Playground.Tests
             // Assert
             Assert.Equal(result, 4);
         }
+
+        [Fact]
+        public void CompareTree()
+        {
+            // Arrange
+            var appDataDir = Environment.CurrentDirectory;
+            var fileSystemService = new FileSystemService();
+            var tree1 = fileSystemService.BuildFileTree(appDataDir).Flatten();
+            var tree2 = fileSystemService.BuildFileTree(appDataDir).Flatten();
+            tree2.RemoveAt(0);
+            tree2.Add(new FileItem() { Name = "Test", Path = "TestPath", IsDirectory = true });
+
+            // Act
+            var deleted_node = tree1.FindAll((f) =>
+            {
+                return tree2.Find((ff) => ff.Equals(f)) == null;
+            });
+
+            var added_node = tree2.FindAll((f) =>
+            {
+                return tree1.Find((ff) => ff.Equals(f)) == null;
+            });
+
+            var deleted_edges = tree1.FindAll((f) =>
+            {
+                var hasEdges = f.IsDirectory == true;
+                return hasEdges && tree2.Find((ff) => ff.Equals(f)) == null;
+            });
+
+            var added_edges = tree2.FindAll((f) =>
+            {
+                var hasEdges = f.IsDirectory == true;
+                return hasEdges && tree1.Find((ff) => ff.Equals(f)) == null;
+            });
+
+            Assert.Equal(1, deleted_node.Count);
+            Assert.Equal(1, added_node.Count);
+            Assert.Equal(1, deleted_edges.Count);
+            Assert.Equal(1, added_edges.Count);
+        }
     }
 }

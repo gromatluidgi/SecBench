@@ -66,6 +66,12 @@ namespace SecBench.Domain.Entities.Files
             return _children.Remove(node);
         }
 
+        public bool RemoveChild(int index)
+        {
+            _children.RemoveAt(index);
+            return true;
+        }
+
         /// <summary>
         /// Traverse any descendant recursively. Be aware of potential stack overflow exception if the
         /// tree is large and deeply nested.
@@ -86,9 +92,9 @@ namespace SecBench.Domain.Entities.Files
         /// a O(N) list.
         /// </summary>
         /// <returns>flattened tree.</returns>
-        public IEnumerable<TFile> Flatten()
+        public List<TFile> Flatten()
         {
-            return new[] { File }.Concat(_children.SelectMany(x => x.Flatten()));
+            return new[] { File }.Concat(_children.SelectMany(x => x.Flatten())).ToList();
         }
 
         public FileTree<TFile>? SearchNode(FileTree<TFile> node)
